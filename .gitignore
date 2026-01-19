@@ -1,0 +1,17 @@
+# virtual environments
+journal_ai/
+.venv/
+venv/
+env/
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+
+# env files
+.env
+
+# OS
+.DS_Store
+Thumbs.db
