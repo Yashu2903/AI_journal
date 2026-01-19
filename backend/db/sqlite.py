@@ -61,7 +61,7 @@ def get_history(session_id: str) -> List[Dict[str, Any]]:
     conn = get_conn()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT id, role, content, created_at FROM messages WHERE session_id = ? ORDER BY created_at ASC
+        SELECT id, session_id, role, content, created_at FROM messages WHERE session_id = ? ORDER BY created_at ASC
     """, (session_id,))
 
     rows = cursor.fetchall()
