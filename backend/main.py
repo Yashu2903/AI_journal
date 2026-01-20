@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime
 
 from .schemas import CreateSessionResponse, AddMessageRequest, MessageOut, HistoryResponse
-from .db.sqlite import init_db, create_session, add_message, get_history
+from .db.sqlite import init_db, create_session as db_create_session, add_message as db_add_message, get_history as db_get_history
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -29,19 +29,18 @@ app.add_middleware(
 @app.post("/sessions", response_model=CreateSessionResponse)
 async def create_session() -> CreateSessionResponse:
     session_id = str(uuid.uuid4())
-    create_session(session_id)
+    db_create_session(session_id)
     return CreateSessionResponse(session_id=session_id)
 
 @app.post("/messages", response_model=MessageOut)
 async def add_message(request: AddMessageRequest) -> MessageOut:
-    
-    create_session(request.session_id)
-    message_id = add_message(request.session_id, request.role, request.content)
+    db_create_session(request.session_id)
+    message_id = db_add_message(request.session_id, request.role, request.content)
     return MessageOut(id=message_id, session_id=request.session_id, role=request.role, content=request.content, created_at=datetime.now())
 
 @app.get("/sessions/{session_id}/history", response_model=HistoryResponse)
 async def get_history(session_id: str) -> HistoryResponse:
-    history = get_history(session_id)
+    history = db_get_history(session_id)
     return HistoryResponse(session_id=session_id, messages=history)
 
 
