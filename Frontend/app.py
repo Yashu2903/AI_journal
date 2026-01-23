@@ -43,13 +43,12 @@ msg = st.chat_input("Enter a message")
 
 if msg:
     try:
-        response = requests.post(f"{api}/messages", json={"session_id": session_id, "role": "user", "content": msg})
+        response = requests.post(f"{api}/chat", json={"session_id": session_id, "role": "user", "content": msg})
         response.raise_for_status()
+        assistant_msg = response.json()["reply"]
 
-        assistant_msg = f"(echo){msg}"
-        response = requests.post(f"{api}/messages", json={"session_id": session_id, "role": "assistant", "content": assistant_msg})
-        response.raise_for_status()
-
+        with st.chat_message("assistant"):
+            st.write(assistant_msg)
         st.rerun()
     except requests.exceptions.RequestException as e:
         st.error(f"Failed to send message: {e}")

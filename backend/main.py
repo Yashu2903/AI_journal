@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import uuid
 from datetime import datetime
-
+from .services.llm import generate_reply
 from .schemas import CreateSessionResponse, AddMessageRequest, MessageOut, HistoryResponse
 from .db.sqlite import init_db, create_session as db_create_session, add_message as db_add_message, get_history as db_get_history
 
@@ -32,16 +32,26 @@ async def create_session() -> CreateSessionResponse:
     db_create_session(session_id)
     return CreateSessionResponse(session_id=session_id)
 
-@app.post("/messages", response_model=MessageOut)
-async def add_message(request: AddMessageRequest) -> MessageOut:
-    db_create_session(request.session_id)
-    message_id = db_add_message(request.session_id, request.role, request.content)
-    return MessageOut(id=message_id, session_id=request.session_id, role=request.role, content=request.content, created_at=datetime.now())
-
 @app.get("/sessions/{session_id}/history", response_model=HistoryResponse)
 async def get_history(session_id: str) -> HistoryResponse:
     history = db_get_history(session_id)
     return HistoryResponse(session_id=session_id, messages=history)
 
+@app.post("/chat")
+async def chat(request: AddMessageRequest):
+
+    db_create_session(request.session_id)
+
+    db_add_message(request.session_id, "user", request.content)
+
+    history = db_get_history(request.session_id)
+
+    llm_messages = [{"role": m["role"], "content": m["content"]} for m in history]
+
+    llm_reply = generate_reply(llm_messages)
+
+    db_add_message(request.session_id, "assistant", llm_reply)
+
+    return {"reply": llm_reply}
 
 
