@@ -4,11 +4,8 @@ from contextlib import asynccontextmanager
 import uuid
 from datetime import datetime
 from .db.chroma import collection
-from .services.memory_writer import write_memory
-from .services.memory_reader import recall_memories
-from .services.prompt_builder import build_prompt
-
-from .services.llm import generate_reply
+from .services.memory import write_memory, recall_memories
+from .services.ai import generate_reply, build_prompt
 from .schemas import CreateSessionResponse, AddMessageRequest, MessageOut, HistoryResponse
 from .db.sqlite import init_db, create_session as db_create_session, add_message as db_add_message, get_history as db_get_history
 

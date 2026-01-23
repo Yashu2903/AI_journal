@@ -4,7 +4,9 @@ from datetime import datetime
 from typing import List, Optional, Dict, Any
 from ..schemas import Role
 
-DB_PATH = Path(__file__).parent.parent / "journal.db"
+# Database file in data/ directory at project root
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+DB_PATH = PROJECT_ROOT / "data" / "journal.db"
 
 _conn: Optional[sqlite3.Connection] = None
 
