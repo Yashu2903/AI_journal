@@ -5,8 +5,24 @@ from datetime import datetime
 Role = Literal["user", "assistant"]
 
 
+class CreateSessionRequest(BaseModel):
+    session_name: Optional[str] = Field(None, description="Optional name for the session")
+
 class CreateSessionResponse(BaseModel):
     session_id: str = Field(..., description="The ID of the session")
+    session_name: str = Field(..., description="The name of the session")
+
+class SessionInfo(BaseModel):
+    session_id: str = Field(..., description="The ID of the session")
+    session_name: str = Field(..., description="The name of the session")
+    created_at: str = Field(..., description="Creation timestamp")
+    message_count: int = Field(..., description="Number of messages in the session")
+
+class SessionsListResponse(BaseModel):
+    sessions: List[SessionInfo] = Field(..., description="List of all sessions")
+
+class UpdateSessionNameRequest(BaseModel):
+    session_name: str = Field(..., description="New name for the session")
 
 class AddMessageRequest(BaseModel):
     session_id: str = Field(..., description="The ID of the session")
